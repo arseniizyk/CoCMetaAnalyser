@@ -33,3 +33,6 @@ The data is updated monthly, starting from January 2025.
 -   I have also created some functions that are not currently used, but the API provides them (retrieving all available seasons and league information).
 
 ---
+
+## 🔧 Planned Features  
+- [ ] Improve performance by using Goroutines and concurrency for fetching player data  
