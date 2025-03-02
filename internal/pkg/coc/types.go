@@ -15,16 +15,19 @@ type BadResponse struct {
 }
 
 type Player struct {
+	Tag    string `json:"tag"`
+	Heroes []struct {
+		Name      string `json:"name"`
+		Equipment []struct {
+			Name string `json:"name"`
+		} `json:"equipment,omitempty"`
+		Village string `json:"village"`
+	} `json:"heroes"`
 }
 
 type LeagueInfo struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
-	// IconUrls struct {
-	// 	Small  string `json:"small"`
-	// 	Tiny   string `json:"tiny"`
-	// 	Medium string `json:"medium"`
-	// } `json:"iconUrls"`
 }
 
 type LeagueSeasons struct {
@@ -35,29 +38,7 @@ type LeagueSeasons struct {
 
 type LeagueSeasonRanking struct {
 	Items []struct {
-		// dont need every line instead of tag, because GetPlayerItems is working by tag
 		Tag string `json:"tag"`
-		// Name        string `json:"name"`
-		// ExpLevel    int    `json:"expLevel"`
-		// Trophies    int    `json:"trophies"`
-		// AttackWins  int    `json:"attackWins"`
-		// DefenseWins int    `json:"defenseWins"`
-		// Rank        int    `json:"rank"`
-		// 	Clan        struct {
-		// 		Tag       string `json:"tag"`
-		// 		Name      string `json:"name"`
-		// 		BadgeUrls struct {
-		// 			Small  string `json:"small"`
-		// 			Large  string `json:"large"`
-		// 			Medium string `json:"medium"`
-		// 		} `json:"badgeUrls"`
-		// 	} `json:"clan,omitempty"`
-		// } `json:"items"`
-		// Paging struct {
-		// 	Cursors struct {
-		// 		After string `json:"after"`
-		// 	} `json:"cursors"`
-		// } `json:"paging"`
 	}
 }
 

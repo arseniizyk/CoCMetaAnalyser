@@ -1,7 +1,9 @@
 package app
 
 import (
+	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/arseniizyk/CoCMetaAnalyser/internal/config"
@@ -10,9 +12,8 @@ import (
 )
 
 type App struct {
-	c    *config.Config
-	http http.Client
-	svc  service.Service
+	c   *config.Config
+	svc service.Service
 }
 
 func New() (*App, error) {
@@ -26,30 +27,21 @@ func New() (*App, error) {
 	svc := service.New(cocClient)
 
 	return &App{
-		c:    cfg,
-		http: httpClient,
-		svc:  svc,
+		c:   cfg,
+		svc: svc,
 	}, nil
 }
 
 func (a *App) Run() error {
-	// _, err := a.svc.GetLeagueSeasonRanking(10000)
-	// if err != nil {
-	// 	return err
-	// }
-	// _, err := a.svc.GetLeagueSeasons()
-	// if err != nil {
-	// 	return err
-	// }
-	// _, err := a.svc.GetLegendaryLeague()
-	// if err != nil {
-	// 	return err
-	// }
-	// league, err := a.service.GetLegendaryLeague()
-	// if err != nil {
-	// 	return err
-	// }
-	// fmt.Println("Legendary League:", league)
+	// minimum 100 players and maximum 25k
+	meta, err := a.svc.GetItemsMeta("2025-02", 100)
+	if err != nil {
+		return err
+	}
 
+	file, _ := os.Create("meta/meta.json")
+	defer file.Close()
+	formatted, _ := json.MarshalIndent(meta, "", "  ")
+	file.Write(formatted)
 	return nil
 }

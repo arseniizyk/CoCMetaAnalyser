@@ -79,15 +79,18 @@ func (c *CoC) GetLeagueSeasons() (*LeagueSeasons, error) {
 	return &seasons, nil
 }
 
-func (c *CoC) GetLeagueSeasonRanking(limit int) (*LeagueSeasonRanking, error) {
+func (c *CoC) GetLeagueSeasonRanking(limit int, season string) (*LeagueSeasonRanking, error) {
 	// leagueID hardcoded, cuz league seasons information is available only for Legendary League
-	// but seasonID could be different
+	// but seasonID could be different, e.g "2025-02"
+	if limit < 100 {
+		limit = 100
+	}
 	if limit > 25000 {
 		limit = 25000
 	}
+
 	leagueID := 29000022
-	seasonID := "2025-02"
-	url := fmt.Sprintf(c.url+"/leagues/%d/seasons/%s", leagueID, seasonID)
+	url := fmt.Sprintf(c.url+"/leagues/%d/seasons/%s?limit=%d", leagueID, season, limit)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
