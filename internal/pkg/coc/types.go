@@ -1,11 +1,16 @@
 package coc
 
-import "net/http"
+import (
+	"net/http"
+	"sync"
+)
 
 type CoC struct {
 	url    string
-	client *http.Client
 	api    string
+	client *http.Client
+	wg     sync.WaitGroup
+	mu     sync.Mutex
 }
 
 type BadResponse struct {
@@ -37,9 +42,9 @@ type LeagueSeasons struct {
 }
 
 type LeagueSeasonRanking struct {
-	Items []struct {
+	Players []struct {
 		Tag string `json:"tag"`
-	}
+	} `json:"items"`
 }
 
 func New(client *http.Client, api string) *CoC {
@@ -47,5 +52,7 @@ func New(client *http.Client, api string) *CoC {
 		url:    "https://api.clashofclans.com/v1",
 		client: client,
 		api:    api,
+		mu:     sync.Mutex{},
+		wg:     sync.WaitGroup{},
 	}
 }
