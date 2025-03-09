@@ -35,4 +35,4 @@ The data is updated monthly, starting from January 2025.
 ---
 
 ## 🔧 Planned Features  
-- [x] Improve performance by using Goroutines and concurrency for fetching player data(2025-02-09)
+- ✅ Improve performance by using Goroutines and concurrency for fetching player data(2025-02-09)
