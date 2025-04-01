@@ -1,7 +1,9 @@
 package app
 
 import (
+	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/arseniizyk/CoCMetaAnalyser/internal/config"
@@ -32,24 +34,24 @@ func New() (*App, error) {
 
 func (a *App) Run() error {
 	// minimum 100 players and maximum 25k
-	// meta, err := a.svc.GetMetaItems(100, "2025-02")
+	// meta, err := a.svc.GetMetaItems(10000, "2025-03")
 	// if err != nil {
 	// 	return err
 	// }
 
-	// file, _ := os.Create("meta/meta.json")
+	// file, _ := os.Create("meta/2025-03/meta10k.json")
 	// defer file.Close()
 	// formatted, _ := json.MarshalIndent(meta, "", "  ")
 	// file.Write(formatted)
 
-	// meta, err = a.svc.GetMetaItemPairs(100, "2025-02")
+	// meta, err = a.svc.GetMetaItemPairs(10000, "2025-03")
 	// if err != nil {
 	// 	return err
 	// }
 
-	// file, _ = os.Create("meta.json")
+	// file, _ = os.Create("metapairs/2025-03/meta10k.json")
 	// defer file.Close()
 	// formatted, _ = json.MarshalIndent(meta, "", "  ")
 	// file.Write(formatted)
-	return nil
+	// return nil
 }
