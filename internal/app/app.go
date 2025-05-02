@@ -52,7 +52,7 @@ func (a *App) Run() error {
 	formatted, _ := json.MarshalIndent(meta, "", "  ")
 	file.Write(formatted)
 
-	meta, err = a.svc.GetMetaItemPairs(100, Date)
+	meta, err = a.svc.GetMetaItemPairs(10000, Date)
 	if err != nil {
 		return err
 	}
