@@ -16,7 +16,7 @@ The data is updated monthly, starting from January 2025.
 
 2. **Create a `.env` File**
 
-    - Place it in `cmd/CoCMetaAnalyser/`
+    - Move it in `cmd/CoCMetaAnalyser/`
     - Add fields from `.env.example`:
         ```ini
         COC_API=your_token
