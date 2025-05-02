@@ -17,7 +17,7 @@ The data is updated monthly, starting from January 2025.
 2. **Create a `.env` File**
 
     - Move it in `cmd/CoCMetaAnalyser/`
-    - Add fields from `.env.example`:
+    - Add fields from [`.env.example`](.env.example):
         ```ini
         COC_API=your_token
         ```
@@ -29,9 +29,16 @@ The data is updated monthly, starting from January 2025.
 
 -   Ensure your API token is valid before running the tool.
 -   Data updates are performed manually every month.
--   You can increase or decrease the number of players (minimum: 100, maximum: 25,000) in app.go.
+-   You can increase or decrease the number of players (minimum: 100, maximum: 25,000) in [`app.go`](internal/app/app.go).
 -   I have also created some functions that are not currently used, but the API provides them (retrieving all available seasons and league information).
 
+## 📁 Data
+-   ## 2025
+    - January [Items](cmd/CoCMetaAnalyser/meta/2025-01)
+    - February [Items](cmd/CoCMetaAnalyser/meta/2025-02)    |    [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-02)
+    - March [Items](cmd/CoCMetaAnalyser/meta/2025-03)    |    [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-03)
+    - April [Items](cmd/CoCMetaAnalyser/meta/2025-04)    |    [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-04)
+      
 ---
 
 ## 🔧 Planned Features  
