@@ -24,7 +24,6 @@ The data is updated monthly, starting from January 2025.
 
 3. **Run**  
    Execute the application using `go run main.go` and use meta or metapairs flags
-   Example:
     ```bash
      go run main.go meta -season 2025-05 -limit 100 -filename meta
     ```
