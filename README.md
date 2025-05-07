@@ -23,7 +23,11 @@ The data is updated monthly, starting from January 2025.
         ```
 
 3. **Run**  
-   Execute the application using `go run main.go`
+   Execute the application using `go run main.go` and use meta or metapairs flags
+   Example:
+    ```bash
+     go run main.go meta -season 2025-05 -limit 100 -filename meta
+    ```
 
 ## 📌 Notes
 
@@ -33,13 +37,16 @@ The data is updated monthly, starting from January 2025.
 -   I have also created some functions that are not currently used, but the API provides them (retrieving all available seasons and league information).
 
 ## 📁 Data
+
 -   ## 2025
-    - January [Items](cmd/CoCMetaAnalyser/meta/2025-01)
-    - February [Items](cmd/CoCMetaAnalyser/meta/2025-02)    |    [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-02)
-    - March [Items](cmd/CoCMetaAnalyser/meta/2025-03)    |    [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-03)
-    - April [Items](cmd/CoCMetaAnalyser/meta/2025-04)    |    [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-04)
-      
+    -   January [Items](cmd/CoCMetaAnalyser/meta/2025-01)
+    -   February [Items](cmd/CoCMetaAnalyser/meta/2025-02) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-02)
+    -   March [Items](cmd/CoCMetaAnalyser/meta/2025-03) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-03)
+    -   April [Items](cmd/CoCMetaAnalyser/meta/2025-04) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-04)
+
 ---
 
-## 🔧 Planned Features  
-- ✅ Improve performance by using Goroutines and concurrency for fetching player data(2025-02-09)
+## 🔧 Planned Features
+
+-   ✅ Improve performance by using Goroutines and concurrency for fetching player data(2025-02-09)
+-   ✅ CLI usage(2025-05-07)
