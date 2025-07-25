@@ -42,6 +42,8 @@ The data is updated monthly, starting from January 2025.
     -   February [Items](cmd/CoCMetaAnalyser/meta/2025-02) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-02)
     -   March [Items](cmd/CoCMetaAnalyser/meta/2025-03) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-03)
     -   April [Items](cmd/CoCMetaAnalyser/meta/2025-04) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-04)
+    -   May [Items](cmd/CoCMetaAnalyser/meta/2025-05) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-05)
+    -   June [Items](cmd/CoCMetaAnalyser/meta/2025-06) | [Pairs](cmd/CoCMetaAnalyser/metapairs/2025-06)
 
 ---
 
