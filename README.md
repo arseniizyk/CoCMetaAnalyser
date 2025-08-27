@@ -2,6 +2,8 @@
 
 A tool that retrieves Hero Equipment data from the top 10,000 Clash of Clans players.
 
+## [Visual Charts](https://arseniizyk.github.io/CoCMetaAnalyser/)
+
 ## 📂 Data Storage
 
 You can find the latest collected data in the [`cmd/CoCMetaAnalyser/meta`](cmd/CoCMetaAnalyser/meta) directory.  
