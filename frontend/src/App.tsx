@@ -114,7 +114,10 @@ export default function App() {
 
         setError(null)
         setData(null)
-        const path = `/${folder}/${effectiveMonth}/${effectiveFile}`
+        
+        const path = `${
+            import.meta.env.BASE_URL
+        }${folder}/${effectiveMonth}/${effectiveFile}`
 
         fetch(path)
             .then((r) => {
