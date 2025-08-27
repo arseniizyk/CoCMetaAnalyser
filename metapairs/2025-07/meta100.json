@@ -1,0 +1,37 @@
+{
+  "Archer Queen": {
+    "Action Figure + Magic Mirror": 35,
+    "Giant Arrow + Action Figure": 50,
+    "Healer Puppet + Action Figure": 2,
+    "Healer Puppet + Giant Arrow": 8,
+    "Healer Puppet + Magic Mirror": 5
+  },
+  "Barbarian King": {
+    "Spiky Ball + Earthquake Boots": 49,
+    "Spiky Ball + Snake Bracelet": 51
+  },
+  "Grand Warden": {
+    "Eternal Tome + Healing Tome": 41,
+    "Fireball + Lavaloon Puppet": 1,
+    "Heroic Torch + Eternal Tome": 1,
+    "Heroic Torch + Healing Tome": 1,
+    "Rage Gem + Eternal Tome": 14,
+    "Rage Gem + Fireball": 26,
+    "Rage Gem + Healing Tome": 15,
+    "Rage Gem + Life Gem": 1
+  },
+  "Minion Prince": {
+    "Dark Orb + Dark Crown": 48,
+    "Dark Orb + Henchmen Puppet": 24,
+    "Metal Pants + Dark Crown": 3,
+    "Metal Pants + Dark Orb": 23,
+    "Noble Iron + Dark Orb": 2
+  },
+  "Royal Champion": {
+    "Haste Vial + Electro Boots": 9,
+    "Hog Rider Puppet + Electro Boots": 9,
+    "Rocket Spear + Electro Boots": 70,
+    "Rocket Spear + Hog Rider Puppet": 1,
+    "Rocket Spear + Seeking Shield": 11
+  }
+}
