@@ -14,6 +14,7 @@ const MONTHS: Record<string, string[]> = {
         '2025-05',
         '2025-06',
         '2025-07',
+        '2025-08'
     ],
     metapairs: [
         '2025-02',
@@ -22,6 +23,7 @@ const MONTHS: Record<string, string[]> = {
         '2025-05',
         '2025-06',
         '2025-07',
+        '2025-08'
     ],
 }
 

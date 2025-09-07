@@ -47,6 +47,7 @@ The data is updated monthly, starting from January 2025.
     -   May [Items](cmd/app/meta/2025-05) | [Pairs](cmd/app/metapairs/2025-05)
     -   June [Items](cmd/app/meta/2025-06) | [Pairs](cmd/app/metapairs/2025-06)
     -   July [Items](cmd/app/meta/2025-07) | [Pairs](cmd/app/metapairs/2025-07)
+    -   August [Items](cmd/app/meta/2025-08) | [Pairs](cmd/app/metapairs/2025-08)
 
 ---
 
