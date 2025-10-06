@@ -120,8 +120,8 @@ func (cli *CommandLine) parseCmdParams(cmd *flag.FlagSet) {
 			os.Exit(1)
 		}
 	}
-	cli.metaPath = fmt.Sprintf("meta/%s/%s.json", *cli.season, *cli.filename)
-	cli.metaPairsPath = fmt.Sprintf("metapairs/%s/%s.json", *cli.season, *cli.filename)
+	cli.metaPath = fmt.Sprintf("../../frontend/public/meta/%s/%s.json", *cli.season, *cli.filename)
+	cli.metaPairsPath = fmt.Sprintf("../../frontend/public/metapairs/%s/%s.json", *cli.season, *cli.filename)
 }
 
 func (cli *CommandLine) initCmdParams(cmd *flag.FlagSet) {
