@@ -1,0 +1,44 @@
+{
+  "Archer Queen": {
+    "Action Figure": 9004,
+    "Archer Puppet": 2,
+    "Frozen Arrow": 24,
+    "Giant Arrow": 6136,
+    "Healer Puppet": 1393,
+    "Invisibility Vial": 3,
+    "Magic Mirror": 3438
+  },
+  "Barbarian King": {
+    "Barbarian Puppet": 11,
+    "Earthquake Boots": 5804,
+    "Giant Gauntlet": 113,
+    "Rage Vial": 52,
+    "Snake Bracelet": 4095,
+    "Spiky Ball": 9902,
+    "Vampstache": 23
+  },
+  "Grand Warden": {
+    "Eternal Tome": 5249,
+    "Fireball": 3017,
+    "Healing Tome": 5504,
+    "Heroic Torch": 63,
+    "Lavaloon Puppet": 11,
+    "Life Gem": 101,
+    "Rage Gem": 6055
+  },
+  "Minion Prince": {
+    "Dark Crown": 3657,
+    "Dark Orb": 9714,
+    "Henchmen Puppet": 3213,
+    "Metal Pants": 2998,
+    "Noble Iron": 418
+  },
+  "Royal Champion": {
+    "Electro Boots": 9089,
+    "Haste Vial": 1763,
+    "Hog Rider Puppet": 900,
+    "Rocket Spear": 7353,
+    "Royal Gem": 3,
+    "Seeking Shield": 892
+  }
+}
