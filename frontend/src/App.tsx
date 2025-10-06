@@ -1,136 +1,76 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './App.css'
 import { Chart } from 'chart.js/auto'
+
+const dataFiles = import.meta.glob('/public/*/*/*.json', { eager: true })
+
+const structure: Record<string, Record<string, string[]>> = {}
+
+for (const path of Object.keys(dataFiles)) {
+    const parts = path.split('/')
+    const folder = parts.at(-3)!
+    const month = parts.at(-2)!
+    const file = parts.at(-1)!
+    if (!structure[folder]) structure[folder] = {}
+    if (!structure[folder][month]) structure[folder][month] = []
+    structure[folder][month].push(file)
+}
 
 type HeroData = Record<string, number | string>
 type JsonRoot = Record<string, HeroData>
 
-const MONTHS: Record<string, string[]> = {
-    meta: [
-        '2025-01',
-        '2025-02',
-        '2025-03',
-        '2025-04',
-        '2025-05',
-        '2025-06',
-        '2025-07',
-        '2025-08',
-    ],
-    metapairs: [
-        '2025-02',
-        '2025-03',
-        '2025-04',
-        '2025-05',
-        '2025-06',
-        '2025-07',
-        '2025-08',
-    ],
-}
-
-const FILES: Record<string, string[]> = {
-    meta: ['meta10k.json'],
-    metapairs: ['meta10k.json', 'meta100.json'],
-}
-
 function HeroChart({ hero, items }: { hero: string; items: HeroData }) {
-    const canvasId = `chart-${hero.replace(/\s+/g, '_')}`
+    const ref = useRef<HTMLCanvasElement | null>(null)
 
     useEffect(() => {
-        const canvas = document.getElementById(
-            canvasId
-        ) as HTMLCanvasElement | null
-        if (!canvas) return
+        if (!ref.current) return
 
-        // destroy old chart
-        // @ts-ignore
-        if (canvas.__chart) {
-            // @ts-ignore
-            canvas.__chart.destroy()
-            // @ts-ignore
-            canvas.__chart = null
-        }
-
-        const labels = Object.keys(items)
-        const data = Object.values(items).map((v) => Number(v || 0))
-
-        // @ts-ignore
-        canvas.__chart = new Chart(canvas, {
+        const chart = new Chart(ref.current, {
             type: 'bar',
-            data: { labels, datasets: [{ label: hero, data, borderWidth: 1 }] },
+            data: {
+                labels: Object.keys(items),
+                datasets: [
+                    { label: hero, data: Object.values(items).map(Number) },
+                ],
+            },
             options: {
                 indexAxis: 'y',
+                plugins: { legend: { display: false } },
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            autoSkip: false,
-                            maxRotation: 90,
-                            minRotation: 30,
-                        },
-                    },
-                    y: { ticks: { autoSkip: false } },
-                },
             },
         })
 
-        return () => {
-            // @ts-ignore
-            if (canvas.__chart) {
-                // @ts-ignore
-                canvas.__chart.destroy()
-                // @ts-ignore
-                canvas.__chart = null
-            }
-        }
-    }, [canvasId, JSON.stringify(items)])
+        return () => chart.destroy()
+    }, [hero, items])
 
     return (
         <div className="hero-card">
             <h3>{hero}</h3>
             <div style={{ height: 260 }}>
-                <canvas id={canvasId}></canvas>
+                <canvas ref={ref}></canvas>
             </div>
         </div>
     )
 }
 
 export default function App() {
-    const [folder, setFolder] = useState<'meta' | 'metapairs'>('meta')
-    const [month, setMonth] = useState(MONTHS['meta'][0])
-    const [fileName, setFileName] = useState(FILES['meta'][0])
+    const [folder, setFolder] = useState(Object.keys(structure)[0])
+    const [month, setMonth] = useState(Object.keys(structure[folder])[0])
+    const [fileName, setFileName] = useState(structure[folder][month][0])
     const [data, setData] = useState<JsonRoot | null>(null)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const months = MONTHS[folder]
-        const files = FILES[folder]
-
-        const effectiveMonth = months.includes(month) ? month : months[0]
-        const effectiveFile = files.includes(fileName) ? fileName : files[0]
-
-        if (effectiveMonth !== month) setMonth(effectiveMonth)
-        if (effectiveFile !== fileName) setFileName(effectiveFile)
-
+        const path = `${import.meta.env.BASE_URL}${folder}/${month}/${fileName}`
         setError(null)
-        setData(null)
-        
-        const path = `${
-            import.meta.env.BASE_URL
-        }${folder}/${effectiveMonth}/${effectiveFile}`
-
         fetch(path)
             .then((r) => {
                 if (!r.ok) throw new Error(`Fetch ${path} failed: ${r.status}`)
                 return r.json()
             })
-            .then((j: JsonRoot) => setData(j))
-            .catch((err) => {
-                console.warn(err)
-                setError(String(err))
-            })
+            .then(setData)
+            .catch((err) => setError(String(err)))
     }, [folder, month, fileName])
 
     return (
@@ -140,12 +80,19 @@ export default function App() {
                     Source:
                     <select
                         value={folder}
-                        onChange={(e) =>
-                            setFolder(e.target.value as 'meta' | 'metapairs')
-                        }
+                        onChange={(e) => {
+                            const newFolder = e.target.value
+                            setFolder(newFolder)
+                            const firstMonth = Object.keys(
+                                structure[newFolder]
+                            )[0]
+                            setMonth(firstMonth)
+                            setFileName(structure[newFolder][firstMonth][0])
+                        }}
                     >
-                        <option value="meta">meta</option>
-                        <option value="metapairs">metapairs</option>
+                        {Object.keys(structure).map((f) => (
+                            <option key={f}>{f}</option>
+                        ))}
                     </select>
                 </label>
 
@@ -153,12 +100,14 @@ export default function App() {
                     Month:
                     <select
                         value={month}
-                        onChange={(e) => setMonth(e.target.value)}
+                        onChange={(e) => {
+                            const newMonth = e.target.value
+                            setMonth(newMonth)
+                            setFileName(structure[folder][newMonth][0])
+                        }}
                     >
-                        {MONTHS[folder].map((m) => (
-                            <option key={m} value={m}>
-                                {m}
-                            </option>
+                        {Object.keys(structure[folder]).map((m) => (
+                            <option key={m}>{m}</option>
                         ))}
                     </select>
                 </label>
@@ -169,26 +118,20 @@ export default function App() {
                         value={fileName}
                         onChange={(e) => setFileName(e.target.value)}
                     >
-                        {FILES[folder].map((f) => (
-                            <option key={f} value={f}>
-                                {f}
-                            </option>
+                        {structure[folder][month].map((f) => (
+                            <option key={f}>{f}</option>
                         ))}
                     </select>
                 </label>
             </div>
 
-            {error && (
-                <div style={{ color: 'crimson', marginTop: 12 }}>
-                    Error: {error}
-                </div>
-            )}
-            {!data && !error && <div style={{ marginTop: 12 }}>Loading...</div>}
+            {error && <div style={{ color: 'crimson' }}>Error: {error}</div>}
+            {!data && !error && <div>Loading...</div>}
 
             {data && (
                 <div className="grid">
-                    {Object.keys(data).map((hero) => (
-                        <HeroChart key={hero} hero={hero} items={data[hero]} />
+                    {Object.entries(data).map(([hero, items]) => (
+                        <HeroChart key={hero} hero={hero} items={items} />
                     ))}
                 </div>
             )}
