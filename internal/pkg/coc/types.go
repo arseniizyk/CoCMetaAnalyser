@@ -1,16 +1,16 @@
 package coc
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
-	"sync"
 )
 
 type CoC struct {
 	url    string
 	api    string
 	client *http.Client
-	wg     sync.WaitGroup
-	mu     sync.Mutex
 }
 
 type BadResponse struct {
@@ -52,7 +52,28 @@ func New(client *http.Client, api string) *CoC {
 		url:    "https://api.clashofclans.com/v1",
 		client: client,
 		api:    api,
-		mu:     sync.Mutex{},
-		wg:     sync.WaitGroup{},
 	}
+}
+
+func parseResponse(resp *http.Response, target any) error {
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("reading response body: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		var badResp BadResponse
+		if err := json.Unmarshal(bodyBytes, &badResp); err == nil && badResp.Message != "" {
+			return fmt.Errorf("status code: %d, reason: %s, message: %s", resp.StatusCode, badResp.Reason, badResp.Message)
+		}
+		return fmt.Errorf("status code: %d, response: %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	if err := json.Unmarshal(bodyBytes, target); err != nil {
+		return fmt.Errorf("decoding response JSON: %w", err)
+	}
+
+	return nil
 }

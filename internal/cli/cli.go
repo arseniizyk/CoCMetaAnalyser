@@ -16,6 +16,7 @@ type CommandLine struct {
 	season        *string
 	limit         *int
 	filename      *string
+	outDir        *string
 	metaPath      string
 	metaPairsPath string
 }
@@ -29,8 +30,12 @@ func New(svc service.Service) *CommandLine {
 func (cli *CommandLine) printUsage() {
 	text := `
 Usage:
-  meta -season SEASON -limit LIMIT -filename FILENAME - outputs meta in JSON format to cmd/app/meta/SEASON/FILENAME.json
-  metapairs -season SEASON -limit LIMIT -filename FILENAME - outputs meta pairs in JSON format to cmd/app/metapairs/SEASON/FILENAME.json
+  all -season SEASON -limit LIMIT -filename FILENAME [-outdir DIR]
+      Outputs both meta and metapairs in a single API pass to <outdir>/{meta,metapairs}/SEASON/FILENAME.json
+  meta -season SEASON -limit LIMIT -filename FILENAME [-outdir DIR]
+      Outputs meta in JSON format to <outdir>/meta/SEASON/FILENAME.json
+  metapairs -season SEASON -limit LIMIT -filename FILENAME [-outdir DIR]
+      Outputs meta pairs in JSON format to <outdir>/metapairs/SEASON/FILENAME.json
 `
 	fmt.Println(text)
 }
@@ -45,27 +50,51 @@ func (cli *CommandLine) validateArgs() {
 func (cli *CommandLine) Run() error {
 	cli.validateArgs()
 
+	allCmd := flag.NewFlagSet("all", flag.ExitOnError)
 	metaCmd := flag.NewFlagSet("meta", flag.ExitOnError)
 	metaPairsCmd := flag.NewFlagSet("metapairs", flag.ExitOnError)
 
 	switch os.Args[1] {
+	case "all":
+		cli.initCmdParams(allCmd)
+		cli.parseCmdParams(allCmd)
+		if err := cli.processAll(); err != nil {
+			return err
+		}
+		fmt.Println("Successfully collected all meta data!")
 	case "meta":
 		cli.initCmdParams(metaCmd)
 		cli.parseCmdParams(metaCmd)
 		if err := cli.processMeta(); err != nil {
 			return err
 		}
-		fmt.Println("Successfully!")
+		fmt.Println("Successfully collected meta items!")
 	case "metapairs":
 		cli.initCmdParams(metaPairsCmd)
 		cli.parseCmdParams(metaPairsCmd)
 		if err := cli.processMetaPairs(); err != nil {
 			return err
 		}
-		fmt.Println("Successfully!")
+		fmt.Println("Successfully collected meta pairs!")
+	default:
+		cli.printUsage()
+		return fmt.Errorf("unknown command: %s", os.Args[1])
 	}
 
 	return nil
+}
+
+func (cli *CommandLine) processAll() error {
+	meta, pairs, err := cli.svc.GetMetaAndPairs(*cli.limit, *cli.season)
+	if err != nil {
+		log.Println("Something went wrong, err:", err)
+		return err
+	}
+
+	if err := writeJSONToFile(cli.metaPath, meta); err != nil {
+		return err
+	}
+	return writeJSONToFile(cli.metaPairsPath, pairs)
 }
 
 func (cli *CommandLine) processMeta() error {
@@ -108,6 +137,23 @@ func writeJSONToFile(path string, data any) error {
 	return err
 }
 
+func resolveBaseDir(customDir string) string {
+	if customDir != "" {
+		return customDir
+	}
+	candidates := []string{
+		"frontend/public",
+		"../../frontend/public",
+		"../frontend/public",
+	}
+	for _, c := range candidates {
+		if fi, err := os.Stat(c); err == nil && fi.IsDir() {
+			return c
+		}
+	}
+	return "frontend/public"
+}
+
 func (cli *CommandLine) parseCmdParams(cmd *flag.FlagSet) {
 	if err := cmd.Parse(os.Args[2:]); err != nil {
 		cli.printUsage()
@@ -120,12 +166,15 @@ func (cli *CommandLine) parseCmdParams(cmd *flag.FlagSet) {
 			os.Exit(1)
 		}
 	}
-	cli.metaPath = fmt.Sprintf("../../frontend/public/meta/%s/%s.json", *cli.season, *cli.filename)
-	cli.metaPairsPath = fmt.Sprintf("../../frontend/public/metapairs/%s/%s.json", *cli.season, *cli.filename)
+
+	baseDir := resolveBaseDir(*cli.outDir)
+	cli.metaPath = filepath.Join(baseDir, "meta", *cli.season, *cli.filename+".json")
+	cli.metaPairsPath = filepath.Join(baseDir, "metapairs", *cli.season, *cli.filename+".json")
 }
 
 func (cli *CommandLine) initCmdParams(cmd *flag.FlagSet) {
 	cli.season = cmd.String("season", "", `Season in format yyyy-mm(2025-05)`)
 	cli.limit = cmd.Int("limit", 0, "Number of players(min 100, max 25k)")
 	cli.filename = cmd.String("filename", "", "Name for output file(without .JSON)")
+	cli.outDir = cmd.String("outdir", "", "Path to frontend/public directory (optional, auto-detected)")
 }

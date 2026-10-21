@@ -1,44 +1,27 @@
 package coc
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-const (
-	badResponse = "Status code: %v, message: %v"
-)
-
 func (c *CoC) GetLeaguesInfo() (*LeagueInfo, error) {
-	leagueID := 29000022 // Legendary League ID(CoC can get season info only from legendary league)
-	url := fmt.Sprintf(c.url+"/leagues/%d", leagueID)
+	leagueID := 29000022 // Legendary League ID (season info only from legendary league)
+	endpoint := fmt.Sprintf("%s/leagues/%d", c.url, leagueID)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	req.Header.Add("Authorization", "Bearer "+c.api)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		var badResp BadResponse
-		err = json.NewDecoder(resp.Body).Decode(&badResp)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf(badResponse, resp.StatusCode, badResp)
-	}
 
 	var league LeagueInfo
-	err = json.NewDecoder(resp.Body).Decode(&league)
-	if err != nil {
+	if err := parseResponse(resp, &league); err != nil {
 		return nil, err
 	}
 
@@ -47,32 +30,21 @@ func (c *CoC) GetLeaguesInfo() (*LeagueInfo, error) {
 
 func (c *CoC) GetLeagueSeasons() (*LeagueSeasons, error) {
 	leagueID := 29000022
-	url := fmt.Sprintf(c.url+"/leagues/%d/seasons", leagueID)
+	endpoint := fmt.Sprintf("%s/leagues/%d/seasons", c.url, leagueID)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	req.Header.Add("Authorization", "Bearer "+c.api)
 
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		var badResp BadResponse
-		err = json.NewDecoder(resp.Body).Decode(&badResp)
-		if err != nil {
-			return nil, err
-		}
-		return nil, fmt.Errorf(badResponse, resp.StatusCode, badResp)
-	}
 
 	var seasons LeagueSeasons
-	err = json.NewDecoder(resp.Body).Decode(&seasons)
-	if err != nil {
+	if err := parseResponse(resp, &seasons); err != nil {
 		return nil, err
 	}
 
@@ -80,8 +52,6 @@ func (c *CoC) GetLeagueSeasons() (*LeagueSeasons, error) {
 }
 
 func (c *CoC) GetLeagueSeasonRanking(limit int, season string) (*LeagueSeasonRanking, error) {
-	// leagueID hardcoded, cuz league seasons information is available only for Legendary League
-	// but seasonID could be different, e.g "2025-02"
 	if limit < 100 {
 		limit = 100
 	}
@@ -90,9 +60,9 @@ func (c *CoC) GetLeagueSeasonRanking(limit int, season string) (*LeagueSeasonRan
 	}
 
 	leagueID := 29000022
-	url := fmt.Sprintf(c.url+"/leagues/%d/seasons/%s?limit=%d", leagueID, season, limit)
+	endpoint := fmt.Sprintf("%s/leagues/%d/seasons/%s?limit=%d", c.url, leagueID, season, limit)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -102,20 +72,9 @@ func (c *CoC) GetLeagueSeasonRanking(limit int, season string) (*LeagueSeasonRan
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		var badResp BadResponse
-		err := json.NewDecoder(resp.Body).Decode(&badResp)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf(badResponse, resp.StatusCode, badResp)
-	}
 
 	var ranking LeagueSeasonRanking
-	err = json.NewDecoder(resp.Body).Decode(&ranking)
-	if err != nil {
+	if err := parseResponse(resp, &ranking); err != nil {
 		return nil, err
 	}
 

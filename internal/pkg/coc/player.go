@@ -1,21 +1,25 @@
 package coc
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 func (c *CoC) GetPlayerInfo(playerTag string) (*Player, error) {
-	if string(playerTag[0]) != "#" {
+	if playerTag == "" {
+		return nil, fmt.Errorf("player tag is empty")
+	}
+
+	if !strings.HasPrefix(playerTag, "#") {
 		playerTag = "#" + playerTag
 	}
 
 	playerTag = url.PathEscape(playerTag)
-	url := fmt.Sprintf(c.url+"/players/%s", playerTag)
+	endpoint := fmt.Sprintf("%s/players/%s", c.url, playerTag)
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -25,20 +29,9 @@ func (c *CoC) GetPlayerInfo(playerTag string) (*Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		var badResp BadResponse
-		err := json.NewDecoder(resp.Body).Decode(&badResp)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf(badResponse, resp.StatusCode, badResp)
-	}
 
 	var player Player
-	err = json.NewDecoder(resp.Body).Decode(&player)
-	if err != nil {
+	if err := parseResponse(resp, &player); err != nil {
 		return nil, err
 	}
 

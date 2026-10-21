@@ -10,7 +10,8 @@ type Service interface {
 	GetLeagueSeasonRanking(limit int, season string) (*coc.LeagueSeasonRanking, error)
 	GetPlayerInfo(playerTag string) (*coc.Player, error)
 	GetMetaItems(limit int, season string) (map[string]map[string]int, error)
-	GetMetaItemPairs(limit int, seasons string) (map[string]map[string]int, error)
+	GetMetaItemPairs(limit int, season string) (map[string]map[string]int, error)
+	GetMetaAndPairs(limit int, season string) (map[string]map[string]int, map[string]map[string]int, error)
 }
 
 type service struct {
@@ -43,4 +44,8 @@ func (s *service) GetMetaItems(limit int, season string) (map[string]map[string]
 
 func (s *service) GetMetaItemPairs(limit int, season string) (map[string]map[string]int, error) {
 	return s.cocClient.GetMetaItemPairs(limit, season)
+}
+
+func (s *service) GetMetaAndPairs(limit int, season string) (map[string]map[string]int, map[string]map[string]int, error) {
+	return s.cocClient.GetMetaAndPairs(limit, season)
 }

@@ -12,10 +12,11 @@ type Config struct {
 }
 
 func New() (*Config, error) {
-	godotenv.Load() // loading .env from cmd/CoCMetaAnalyser
+	// Try loading .env from current directory or parent directories if available
+	_ = godotenv.Load(".env", "../../.env", "../.env")
 	cocToken := os.Getenv("COC_API")
 	if cocToken == "" {
-		return nil, fmt.Errorf("Please provide COC_API in .env")
+		return nil, fmt.Errorf("please provide COC_API in .env or environment variable")
 	}
 	return &Config{
 		CocToken: cocToken,
