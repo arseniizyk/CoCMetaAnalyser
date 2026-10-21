@@ -1,0 +1,50 @@
+{
+  "Archer Queen": {
+    "Action Figure + Giant Arrow": 47,
+    "Action Figure + Magic Mirror": 19,
+    "Action Figure + Monolith Arrow": 29,
+    "Giant Arrow + Healer Puppet": 3
+  },
+  "Barbarian King": {
+    "Earthquake Boots + Spiky Ball": 10,
+    "Giant Gauntlet + Snake Bracelet": 1,
+    "Giant Gauntlet + Stick Horse": 11,
+    "Snake Bracelet + Spiky Ball": 71,
+    "Spiky Ball + Stick Horse": 5
+  },
+  "Dragon Duke": {
+    "Electro Fangs + Fire Heart": 8,
+    "Electro Fangs + Rocket Backpack": 10,
+    "Electro Fangs + Stun Blaster": 13,
+    "Fire Heart + Revenge Deck": 19,
+    "Fire Heart + Rocket Backpack": 26,
+    "Fire Heart + Stun Blaster": 6,
+    "Flame Blower + Rocket Backpack": 9,
+    "Revenge Deck + Rocket Backpack": 7
+  },
+  "Grand Warden": {
+    "Eternal Tome + Healing Tome": 25,
+    "Eternal Tome + Heroic Torch": 23,
+    "Eternal Tome + Lavaloon Puppet": 8,
+    "Eternal Tome + Life Gem": 1,
+    "Fireball + Life Gem": 6,
+    "Fireball + Rage Gem": 3,
+    "Heroic Torch + Rage Gem": 5,
+    "Life Gem + Rage Gem": 27
+  },
+  "Minion Prince": {
+    "Dark Crown + Dark Orb": 17,
+    "Dark Crown + Portal Pendant": 1,
+    "Dark Orb + Henchmen Puppet": 1,
+    "Dark Orb + Meteor Staff": 68,
+    "Meteor Staff + Portal Pendant": 11
+  },
+  "Royal Champion": {
+    "Electro Boots + Frost Flake": 1,
+    "Electro Boots + Haste Vial": 2,
+    "Electro Boots + Hog Rider Puppet": 1,
+    "Electro Boots + Rocket Spear": 10,
+    "Electro Boots + Royal Gem": 1,
+    "Rocket Spear + Seeking Shield": 83
+  }
+}
