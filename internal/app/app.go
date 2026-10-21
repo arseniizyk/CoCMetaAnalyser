@@ -32,6 +32,10 @@ func New() (*App, error) {
 }
 
 func (a *App) Run() error {
+	if a.c.Cleanup != nil {
+		defer a.c.Cleanup()
+	}
+
 	cli := cli.New(a.svc)
 	if err := cli.Run(); err != nil {
 		return err

@@ -68,6 +68,8 @@ jobs:
       - name: Run collector
         env:
           COC_API: ${{ secrets.COC_API }}
+          COC_EMAIL: ${{ secrets.COC_EMAIL }}
+          COC_PASSWORD: ${{ secrets.COC_PASSWORD }}
         run: |
           MODE="${{ steps.season_step.outputs.mode }}"
           LIMIT="${{ github.event.inputs.limit || '10000' }}"
