@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from 'react'
 import './App.css'
+import { TrendsView } from './TrendsView'
 import {
     Chart,
     BarController,
@@ -297,6 +298,7 @@ function HeroCard({
 }
 
 export default function App() {
+    const [activeTab, setActiveTab] = useState<'snapshot' | 'trends'>('snapshot')
     const folders = Object.keys(structure)
     const [folder, setFolder] = useState<string>(folders[0] || 'meta')
 
@@ -397,8 +399,28 @@ export default function App() {
                 </div>
             </header>
 
-            {/* Controls Panel */}
-            <div className="controls-panel">
+            {/* Top View Mode Tabs */}
+            <div className="app-tabs-bar">
+                <button
+                    className={`tab-btn ${activeTab === 'snapshot' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('snapshot')}
+                >
+                    <span>📊</span> Monthly Snapshot
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'trends' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('trends')}
+                >
+                    <span>📈</span> Historical Trends (2025–2026)
+                </button>
+            </div>
+
+            {activeTab === 'trends' ? (
+                <TrendsView structure={structure} dataFiles={dataFiles} />
+            ) : (
+                <>
+                    {/* Controls Panel */}
+                    <div className="controls-panel">
                 <div className="control-group">
                     {/* Mode Tabs: meta vs metapairs */}
                     <div className="tab-switcher">
@@ -506,6 +528,8 @@ export default function App() {
                         />
                     ))}
                 </div>
+            )}
+                </>
             )}
         </div>
     )
