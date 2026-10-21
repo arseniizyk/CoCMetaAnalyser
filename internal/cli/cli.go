@@ -7,6 +7,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/arseniizyk/CoCMetaAnalyser/internal/service"
 )
@@ -162,6 +165,44 @@ func resolveBaseDir(customDir string) string {
 	return "frontend/public"
 }
 
+// NormalizeSeason converts various CoC season ID formats into a clean YYYY-MM representation.
+func NormalizeSeason(raw string) string {
+	raw = strings.TrimSpace(raw)
+	if matched, _ := regexp.MatchString(`^\d{4}-\d{2}$`, raw); matched {
+		return raw
+	}
+
+	re := regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})`)
+	m := re.FindStringSubmatch(raw)
+	if len(m) == 4 {
+		year, _ := strconv.Atoi(m[1])
+		month, _ := strconv.Atoi(m[2])
+		day, _ := strconv.Atoi(m[3])
+
+		if strings.HasPrefix(raw, "v2-") {
+			if day >= 28 {
+				month++
+				if month > 12 {
+					month = 1
+					year++
+				}
+			}
+			return fmt.Sprintf("%04d-%02d", year, month)
+		}
+
+		if day <= 7 {
+			month--
+			if month == 0 {
+				month = 12
+				year--
+			}
+		}
+		return fmt.Sprintf("%04d-%02d", year, month)
+	}
+
+	return raw
+}
+
 func fileExists(path string) bool {
 	fi, err := os.Stat(path)
 	return err == nil && !fi.IsDir() && fi.Size() > 0
@@ -206,15 +247,16 @@ func (cli *CommandLine) processBackfill() error {
 			continue
 		}
 
-		metaFile := filepath.Join(baseDir, "meta", s.ID, *filename+".json")
-		pairsFile := filepath.Join(baseDir, "metapairs", s.ID, *filename+".json")
+		cleanSeason := NormalizeSeason(s.ID)
+		metaFile := filepath.Join(baseDir, "meta", cleanSeason, *filename+".json")
+		pairsFile := filepath.Join(baseDir, "metapairs", cleanSeason, *filename+".json")
 
 		if fileExists(metaFile) && fileExists(pairsFile) {
-			log.Printf("Season %s already collected, skipping", s.ID)
+			log.Printf("Season %s (%s) already collected, skipping", cleanSeason, s.ID)
 			continue
 		}
 
-		log.Printf("Collecting missing data for season %s (limit: %d)...", s.ID, *limit)
+		log.Printf("Collecting missing data for season %s (API: %s, limit: %d)...", cleanSeason, s.ID, *limit)
 		meta, pairs, err := cli.svc.GetMetaAndPairs(*limit, s.ID)
 		if err != nil {
 			log.Printf("Failed to collect season %s: %v", s.ID, err)
@@ -227,7 +269,7 @@ func (cli *CommandLine) processBackfill() error {
 		if err := writeJSONToFile(pairsFile, pairs); err != nil {
 			return err
 		}
-		log.Printf("Successfully saved season %s to %s and %s", s.ID, metaFile, pairsFile)
+		log.Printf("Successfully saved season %s to %s and %s", cleanSeason, metaFile, pairsFile)
 	}
 
 	fmt.Println("Backfill completed!")
@@ -248,8 +290,9 @@ func (cli *CommandLine) parseCmdParams(cmd *flag.FlagSet) {
 	}
 
 	baseDir := resolveBaseDir(*cli.outDir)
-	cli.metaPath = filepath.Join(baseDir, "meta", *cli.season, *cli.filename+".json")
-	cli.metaPairsPath = filepath.Join(baseDir, "metapairs", *cli.season, *cli.filename+".json")
+	cleanSeason := NormalizeSeason(*cli.season)
+	cli.metaPath = filepath.Join(baseDir, "meta", cleanSeason, *cli.filename+".json")
+	cli.metaPairsPath = filepath.Join(baseDir, "metapairs", cleanSeason, *cli.filename+".json")
 }
 
 func (cli *CommandLine) initCmdParams(cmd *flag.FlagSet) {
