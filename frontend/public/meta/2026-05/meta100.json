@@ -1,0 +1,50 @@
+{
+  "Archer Queen": {
+    "Action Figure": 84,
+    "Giant Arrow": 60,
+    "Healer Puppet": 6,
+    "Magic Mirror": 27,
+    "Monolith Arrow": 15
+  },
+  "Barbarian King": {
+    "Earthquake Boots": 21,
+    "Giant Gauntlet": 21,
+    "Rage Vial": 2,
+    "Snake Bracelet": 46,
+    "Spiky Ball": 74,
+    "Stick Horse": 28
+  },
+  "Dragon Duke": {
+    "Electro Fangs": 29,
+    "Fire Heart": 58,
+    "Flame Blower": 9,
+    "Revenge Deck": 32,
+    "Rocket Backpack": 46,
+    "Stun Blaster": 18
+  },
+  "Grand Warden": {
+    "Eternal Tome": 55,
+    "Fireball": 26,
+    "Healing Tome": 35,
+    "Heroic Torch": 14,
+    "Lavaloon Puppet": 4,
+    "Life Gem": 26,
+    "Rage Gem": 32
+  },
+  "Minion Prince": {
+    "Dark Crown": 15,
+    "Dark Orb": 76,
+    "Metal Pants": 1,
+    "Meteor Staff": 80,
+    "Portal Pendant": 20
+  },
+  "Royal Champion": {
+    "Electro Boots": 17,
+    "Frost Flake": 3,
+    "Haste Vial": 3,
+    "Hog Rider Puppet": 1,
+    "Rocket Spear": 88,
+    "Royal Gem": 1,
+    "Seeking Shield": 79
+  }
+}
