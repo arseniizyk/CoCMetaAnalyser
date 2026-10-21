@@ -1,5 +1,10 @@
 # CoCMetaAnalyser
 
+[![Go CI](https://github.com/arseniizyk/CoCMetaAnalyser/actions/workflows/ci.yml/badge.svg)](https://github.com/arseniizyk/CoCMetaAnalyser/actions/workflows/ci.yml)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Dashboard-brightgreen?logo=github)](https://arseniizyk.github.io/CoCMetaAnalyser/)
+[![Go Version](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 A modern tool and interactive dashboard that retrieves and visualizes Hero Equipment meta data from top Clash of Clans Legendary League players.
 
 ## 📊 [Live Interactive Dashboard](https://arseniizyk.github.io/CoCMetaAnalyser/)
