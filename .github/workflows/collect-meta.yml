@@ -1,0 +1,103 @@
+name: Collect CoC Meta Statistics
+
+on:
+  schedule:
+    # Runs at 04:00 UTC on day 1 of every month
+    - cron: '0 4 1 * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Collection mode'
+        required: true
+        default: 'monthly'
+        type: choice
+        options:
+          - 'monthly'
+          - 'backfill'
+          - 'season'
+      season:
+        description: 'Season (e.g. 2025-10, only used when mode=season)'
+        required: false
+        default: ''
+        type: string
+      limit:
+        description: 'Player limit (min 100, max 25000)'
+        required: true
+        default: '10000'
+        type: string
+      filename:
+        description: 'Output filename (without .json)'
+        required: true
+        default: 'meta10k'
+        type: string
+
+jobs:
+  collect-and-commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Determine season to collect
+        id: season_step
+        run: |
+          MODE="${{ github.event.inputs.mode || 'monthly' }}"
+          echo "mode=$MODE" >> $GITHUB_OUTPUT
+          
+          if [ "$MODE" = "season" ]; then
+            TARGET_SEASON="${{ github.event.inputs.season }}"
+            echo "target_season=$TARGET_SEASON" >> $GITHUB_OUTPUT
+          elif [ "$MODE" = "monthly" ]; then
+            # Previous month in YYYY-MM format
+            TARGET_SEASON=$(date -u -d "$(date -u +%Y-%m-15) -1 month" +%Y-%m 2>/dev/null || date -u -v-1m +%Y-%m)
+            echo "target_season=$TARGET_SEASON" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run collector
+        env:
+          COC_API: ${{ secrets.COC_API }}
+        run: |
+          MODE="${{ steps.season_step.outputs.mode }}"
+          LIMIT="${{ github.event.inputs.limit || '10000' }}"
+          FILENAME="${{ github.event.inputs.filename || 'meta10k' }}"
+          
+          if [ "$MODE" = "backfill" ]; then
+            echo "Running automated backfill for all missing seasons..."
+            go run ./cmd/app backfill -from 2025-01 -limit "$LIMIT" -filename "$FILENAME"
+          else
+            TARGET_SEASON="${{ steps.season_step.outputs.target_season }}"
+            echo "Collecting meta for season: $TARGET_SEASON (limit: $LIMIT)"
+            go run ./cmd/app all -season "$TARGET_SEASON" -limit "$LIMIT" -filename "$FILENAME"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          git add frontend/public/meta frontend/public/metapairs
+          
+          if git diff --staged --quiet; then
+            echo "No new statistics to commit."
+          else
+            MODE="${{ steps.season_step.outputs.mode }}"
+            TARGET_SEASON="${{ steps.season_step.outputs.target_season }}"
+            if [ "$MODE" = "backfill" ]; then
+              git commit -m "chore(data): backfill missing season statistics"
+            else
+              git commit -m "chore(data): add $TARGET_SEASON meta statistics"
+            fi
+            git push origin main
+          fi

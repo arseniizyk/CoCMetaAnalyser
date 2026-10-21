@@ -1,57 +1,56 @@
 # CoCMetaAnalyser
 
-A tool that retrieves Hero Equipment data from the top 10,000 Clash of Clans players.
+A modern tool and interactive dashboard that retrieves and visualizes Hero Equipment meta data from top Clash of Clans Legendary League players.
 
-## [Visual Charts](https://arseniizyk.github.io/CoCMetaAnalyser/)
+## 📊 [Live Interactive Dashboard](https://arseniizyk.github.io/CoCMetaAnalyser/)
 
 ## 📂 Data Storage
 
-You can find the latest collected data in the [`cmd/CoCMetaAnalyser/meta`](cmd/CoCMetaAnalyser/meta) directory.  
-The data is updated monthly, starting from January 2025.
+Meta statistics are stored as formatted JSON files in the [`frontend/public/meta`](frontend/public/meta) and [`frontend/public/metapairs`](frontend/public/metapairs) directories.
 
-## 🚀 How to Run
+Data is collected monthly for top 10,000 players in Legendary League.
+
+## 🚀 How to Run Locally
 
 1. **Set Up API Access**
+   - Register at the [Clash of Clans Developer Portal](https://developer.clashofclans.com/)
+   - Create an API key for your IP address
 
-    - Register at [Clash of Clans API](https://developer.clashofclans.com/)
-    - Get your API token
+2. **Configure Environment**
+   - Copy `.env.example` to `.env` in the repository root:
+     ```ini
+     COC_API=your_token_here
+     ```
 
-2. **Create a `.env` File**
+3. **CLI Usage**
+   - Collect both single items and pairs in a single API pass:
+     ```bash
+     go run ./cmd/app all -season 2025-05 -limit 10000 -filename meta10k
+     ```
+   - Automatically backfill all missing seasons from CoC API:
+     ```bash
+     go run ./cmd/app backfill -from 2025-01 -limit 10000 -filename meta10k
+     ```
+   - List available Legendary League seasons:
+     ```bash
+     go run ./cmd/app seasons
+     ```
 
-    - Move it in `cmd/CoCMetaAnalyser/`
-    - Add fields from [`.env.example`](.env.example):
-        ```ini
-        COC_API=your_token
-        ```
+## 🤖 Automated CI/CD Workflows
 
-3. **Run**  
-   Execute the application using `go run main.go` and use meta or metapairs flags
-    ```bash
-     go run main.go meta -season 2025-05 -limit 100 -filename meta
-    ```
+- **Monthly Auto-Collector (`collect-meta.yml`)**:
+  - Automatically runs on the 1st of every month via GitHub Actions cron.
+  - Retrieves statistics for the previous month, commits the data to `main`.
+  - Automatically triggers GitHub Pages rebuild via `deploy.yml`.
+  - Can also be triggered manually via GitHub Actions **Run workflow** (supports single season collection or automated backfill).
 
-## 📌 Notes
+- **GitHub Pages Deployment (`deploy.yml`)**:
+  - Automatically builds and deploys the Vite + React dashboard upon changes to `main`.
 
--   Ensure your API token is valid before running the tool.
--   Data updates are performed manually every month.
--   You can increase or decrease the number of players (minimum: 100, maximum: 25,000) in [`app.go`](internal/app/app.go).
--   I have also created some functions that are not currently used, but the API provides them (retrieving all available seasons and league information).
+## 💻 Frontend Development
 
-## 📁 Data
-
--   ## 2025
-    -   January [Items](cmd/app/meta/2025-01)
-    -   February [Items](cmd/app/meta/2025-02) | [Pairs](cmd/app/metapairs/2025-02)
-    -   March [Items](cmd/app/meta/2025-03) | [Pairs](cmd/app/metapairs/2025-03)
-    -   April [Items](cmd/app/meta/2025-04) | [Pairs](cmd/app/metapairs/2025-04)
-    -   May [Items](cmd/app/meta/2025-05) | [Pairs](cmd/app/metapairs/2025-05)
-    -   June [Items](cmd/app/meta/2025-06) | [Pairs](cmd/app/metapairs/2025-06)
-    -   July [Items](cmd/app/meta/2025-07) | [Pairs](cmd/app/metapairs/2025-07)
-    -   August [Items](cmd/app/meta/2025-08) | [Pairs](cmd/app/metapairs/2025-08)
-
----
-
-## 🔧 Planned Features
-
--   ✅ Improve performance by using Goroutines and concurrency for fetching player data(2025-02-09)
--   ✅ CLI usage(2025-05-07)
+```bash
+cd frontend
+npm install
+npm run dev
+```

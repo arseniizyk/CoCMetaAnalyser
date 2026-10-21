@@ -36,6 +36,10 @@ Usage:
       Outputs meta in JSON format to <outdir>/meta/SEASON/FILENAME.json
   metapairs -season SEASON -limit LIMIT -filename FILENAME [-outdir DIR]
       Outputs meta pairs in JSON format to <outdir>/metapairs/SEASON/FILENAME.json
+  seasons
+      Lists all available Legendary League seasons from CoC API
+  backfill [-from SEASON] [-limit LIMIT] [-filename FILENAME] [-outdir DIR]
+      Automatically discovers and collects missing seasons
 `
 	fmt.Println(text)
 }
@@ -76,6 +80,10 @@ func (cli *CommandLine) Run() error {
 			return err
 		}
 		fmt.Println("Successfully collected meta pairs!")
+	case "seasons":
+		return cli.processSeasons()
+	case "backfill":
+		return cli.processBackfill()
 	default:
 		cli.printUsage()
 		return fmt.Errorf("unknown command: %s", os.Args[1])
@@ -152,6 +160,78 @@ func resolveBaseDir(customDir string) string {
 		}
 	}
 	return "frontend/public"
+}
+
+func fileExists(path string) bool {
+	fi, err := os.Stat(path)
+	return err == nil && !fi.IsDir() && fi.Size() > 0
+}
+
+func (cli *CommandLine) processSeasons() error {
+	seasons, err := cli.svc.GetLeagueSeasons()
+	if err != nil {
+		return fmt.Errorf("fetching league seasons: %w", err)
+	}
+
+	fmt.Println("Available Legendary League seasons:")
+	for _, s := range seasons.Items {
+		fmt.Println(" -", s.ID)
+	}
+	return nil
+}
+
+func (cli *CommandLine) processBackfill() error {
+	backfillCmd := flag.NewFlagSet("backfill", flag.ExitOnError)
+	limit := backfillCmd.Int("limit", 10000, "Number of players (min 100, max 25k)")
+	filename := backfillCmd.String("filename", "meta10k", "Name for output file (without .JSON)")
+	outDir := backfillCmd.String("outdir", "", "Path to frontend/public directory (optional)")
+	fromSeason := backfillCmd.String("from", "2025-01", "Start season filter (optional, e.g. 2025-01)")
+
+	if len(os.Args) > 2 {
+		if err := backfillCmd.Parse(os.Args[2:]); err != nil {
+			return err
+		}
+	}
+
+	baseDir := resolveBaseDir(*outDir)
+	seasons, err := cli.svc.GetLeagueSeasons()
+	if err != nil {
+		return fmt.Errorf("fetching seasons: %w", err)
+	}
+
+	log.Printf("Found %d total seasons in CoC API. Checking for missing seasons starting from %s...", len(seasons.Items), *fromSeason)
+
+	for _, s := range seasons.Items {
+		if *fromSeason != "" && s.ID < *fromSeason {
+			continue
+		}
+
+		metaFile := filepath.Join(baseDir, "meta", s.ID, *filename+".json")
+		pairsFile := filepath.Join(baseDir, "metapairs", s.ID, *filename+".json")
+
+		if fileExists(metaFile) && fileExists(pairsFile) {
+			log.Printf("Season %s already collected, skipping", s.ID)
+			continue
+		}
+
+		log.Printf("Collecting missing data for season %s (limit: %d)...", s.ID, *limit)
+		meta, pairs, err := cli.svc.GetMetaAndPairs(*limit, s.ID)
+		if err != nil {
+			log.Printf("Failed to collect season %s: %v", s.ID, err)
+			continue
+		}
+
+		if err := writeJSONToFile(metaFile, meta); err != nil {
+			return err
+		}
+		if err := writeJSONToFile(pairsFile, pairs); err != nil {
+			return err
+		}
+		log.Printf("Successfully saved season %s to %s and %s", s.ID, metaFile, pairsFile)
+	}
+
+	fmt.Println("Backfill completed!")
+	return nil
 }
 
 func (cli *CommandLine) parseCmdParams(cmd *flag.FlagSet) {
