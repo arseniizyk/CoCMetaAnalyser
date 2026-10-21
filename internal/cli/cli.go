@@ -96,16 +96,32 @@ func (cli *CommandLine) Run() error {
 }
 
 func (cli *CommandLine) processAll() error {
-	meta, pairs, err := cli.svc.GetMetaAndPairs(*cli.limit, *cli.season)
+	res, err := cli.svc.GetMetaFull(*cli.limit, *cli.season)
 	if err != nil {
 		log.Println("Something went wrong, err:", err)
 		return err
 	}
 
-	if err := writeJSONToFile(cli.metaPath, meta); err != nil {
+	if err := writeJSONToFile(cli.metaPath, res.ItemsTotal); err != nil {
 		return err
 	}
-	return writeJSONToFile(cli.metaPairsPath, pairs)
+	if err := writeJSONToFile(cli.metaPairsPath, res.PairsTotal); err != nil {
+		return err
+	}
+
+	// If collecting 10k or large sample, automatically save top-100 files as well
+	if *cli.limit >= 100 && *cli.filename != "meta100" && len(res.ItemsTop100) > 0 {
+		baseDir := resolveBaseDir(*cli.outDir)
+		cleanSeason := NormalizeSeason(*cli.season)
+		meta100Path := filepath.Join(baseDir, "meta", cleanSeason, "meta100.json")
+		pairs100Path := filepath.Join(baseDir, "metapairs", cleanSeason, "meta100.json")
+
+		_ = writeJSONToFile(meta100Path, res.ItemsTop100)
+		_ = writeJSONToFile(pairs100Path, res.PairsTop100)
+		log.Printf("Also automatically generated Top-100 files for season %s", cleanSeason)
+	}
+
+	return nil
 }
 
 func (cli *CommandLine) processMeta() error {
@@ -257,18 +273,27 @@ func (cli *CommandLine) processBackfill() error {
 		}
 
 		log.Printf("Collecting missing data for season %s (API: %s, limit: %d)...", cleanSeason, s.ID, *limit)
-		meta, pairs, err := cli.svc.GetMetaAndPairs(*limit, s.ID)
+		res, err := cli.svc.GetMetaFull(*limit, s.ID)
 		if err != nil {
 			log.Printf("Failed to collect season %s: %v", s.ID, err)
 			continue
 		}
 
-		if err := writeJSONToFile(metaFile, meta); err != nil {
+		if err := writeJSONToFile(metaFile, res.ItemsTotal); err != nil {
 			return err
 		}
-		if err := writeJSONToFile(pairsFile, pairs); err != nil {
+		if err := writeJSONToFile(pairsFile, res.PairsTotal); err != nil {
 			return err
 		}
+
+		// Also auto-save top 100 if collecting a larger sample
+		if *limit >= 100 && *filename != "meta100" && len(res.ItemsTop100) > 0 {
+			meta100File := filepath.Join(baseDir, "meta", cleanSeason, "meta100.json")
+			pairs100File := filepath.Join(baseDir, "metapairs", cleanSeason, "meta100.json")
+			_ = writeJSONToFile(meta100File, res.ItemsTop100)
+			_ = writeJSONToFile(pairs100File, res.PairsTop100)
+		}
+
 		log.Printf("Successfully saved season %s to %s and %s", cleanSeason, metaFile, pairsFile)
 	}
 

@@ -12,6 +12,7 @@ type Service interface {
 	GetMetaItems(limit int, season string) (map[string]map[string]int, error)
 	GetMetaItemPairs(limit int, season string) (map[string]map[string]int, error)
 	GetMetaAndPairs(limit int, season string) (map[string]map[string]int, map[string]map[string]int, error)
+	GetMetaFull(limit int, season string) (*coc.MetaResultSet, error)
 }
 
 type service struct {
@@ -48,4 +49,8 @@ func (s *service) GetMetaItemPairs(limit int, season string) (map[string]map[str
 
 func (s *service) GetMetaAndPairs(limit int, season string) (map[string]map[string]int, map[string]map[string]int, error) {
 	return s.cocClient.GetMetaAndPairs(limit, season)
+}
+
+func (s *service) GetMetaFull(limit int, season string) (*coc.MetaResultSet, error) {
+	return s.cocClient.GetMetaFull(limit, season)
 }
